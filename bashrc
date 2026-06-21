@@ -92,6 +92,18 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 
+# CommandNode project CLIs.
+# Keep self-contained project tools under ~/Projects while exposing stable
+# commands in interactive shells. The duplicate checks keep PATH tidy when
+# this file is sourced repeatedly.
+if [ -d "$HOME/.local/bin" ] && [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+    export PATH="$HOME/.local/bin:$PATH"
+fi
+
+if [ -d "$HOME/Projects/Weblock/bin" ] && [[ ":$PATH:" != *":$HOME/Projects/Weblock/bin:"* ]]; then
+    export PATH="$HOME/Projects/Weblock/bin:$PATH"
+fi
+
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
@@ -115,4 +127,3 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
-
