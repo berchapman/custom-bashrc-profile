@@ -14,7 +14,7 @@ Includes the standard Ubuntu `.bashrc` features (history, aliases, completion, d
 - Red username + green hostname in `PS1`
 - `force_color_prompt=yes` so colors work reliably
 - Compatible with most modern terminal emulators (gnome-terminal, etc.)
-- Bonus: `sudo-timeout` helper for 30-minute sudo credential caching
+- Bonus: `sudo-timeout` helper for 30-minute cross-terminal sudo credential caching
 
 ## Installation
 
@@ -38,28 +38,44 @@ cp ~/custom-bashrc-profile/bashrc ~/.bashrc
 source ~/.bashrc
 ```
 
-## Sudo Timeout (optional, 30 minutes)
+## Sudo Cache Policy (optional, 30 minutes, cross-terminal)
 
-This repo also includes a ready-to-use snippet for extending sudo password caching.
+This repo also includes a ready-to-use sudoers snippet for extending sudo
+password caching and sharing the timestamp across terminal contexts for the same
+user. That means one successful `sudo -v` in Ghostty can also satisfy later
+non-interactive checks such as `sudo -n true` for up to 30 minutes.
+
+Ubuntu 26.04 may default to `sudo-rs`, which does not support the global
+timestamp option used here. CommandNode switches the `sudo` alternative to the
+classic sudo implementation (`/usr/bin/sudo.ws`) before installing this policy.
+For manual installs, make the same switch first if `sudo -V` prints `sudo-rs`.
 
 ```bash
 cd ~/custom-bashrc-profile
-sudo install -m 440 sudo-timeout /etc/sudoers.d/timeout
-sudo visudo -c -f /etc/sudoers.d/timeout && echo "30-minute sudo timeout enabled"
+sudo update-alternatives --set sudo /usr/bin/sudo.ws
+sudo install -m 440 sudo-timeout /etc/sudoers.d/commandnode-sudo-cache
+sudo visudo -c -f /etc/sudoers.d/commandnode-sudo-cache && echo "30-minute global sudo cache enabled"
 ```
 
 Or manually:
 
 ```bash
-echo 'Defaults timestamp_timeout=30' | sudo tee /etc/sudoers.d/timeout
-sudo chmod 440 /etc/sudoers.d/timeout
+{
+  echo 'Defaults timestamp_timeout=30'
+  echo 'Defaults timestamp_type=global'
+} | sudo tee /etc/sudoers.d/commandnode-sudo-cache
+sudo chmod 440 /etc/sudoers.d/commandnode-sudo-cache
+sudo visudo -c -f /etc/sudoers.d/commandnode-sudo-cache
 ```
 
 Verify:
 
 ```bash
 sudo -v
+sudo -n true && echo "sudo cache is available to non-interactive commands"
 ```
+
+Use `sudo -k` to clear the cached credential before the 30-minute timeout.
 
 ## Preview
 

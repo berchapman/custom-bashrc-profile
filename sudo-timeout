@@ -1,1 +1,7 @@
+# Managed by custom-bashrc-profile / CommandNode.
+#
+# Keep sudo authentication valid for 30 minutes and share that timestamp across
+# terminal contexts for the same user. This lets a `sudo -v` run in Ghostty
+# refresh sudo for other shells and non-interactive local tooling.
 Defaults timestamp_timeout=30
+Defaults timestamp_type=global
